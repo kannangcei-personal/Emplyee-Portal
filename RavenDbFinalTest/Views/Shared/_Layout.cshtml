@@ -1,16 +1,21 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor 
+
+@{
     string rolemessage = ViewBag.name;
-    
+    string loggedname = HttpContextAccessor.HttpContext.Session.GetString("username");
+
+    string loggeduserid = HttpContextAccessor.HttpContext.Session.GetString("userid");
 }   
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EmployeePortal_UI</title>
+    <title>@ViewData["Title"] - Employee Portal</title>
+    <link rel="stylesheet" asp-append-version="true" media="screen" />
     <link rel="stylesheet" href="~/mdb5-free-standard/css/mdb.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EmployeePortal_UI.styles.css" asp-append-version="true" />
 </head>
 <body style="background-color:#ECECF2">
     <header>    <!-- Navbar -->  
@@ -24,16 +29,50 @@
                         <img src="https://ok12static.oktacdn.com/fs/bco/1/fs055r3ijj5Xaoifk5d7" height="40" alt=" Logo" loading="lazy" />  
                   </a>                <!-- Left links -->                <!-- Left links -->   
                  </div>            <!-- Collapsible wrapper -->            <!-- Right elements -->     
-                 <div class="d-flex align-items-center">                <!-- Icon -->                <!-- Notifications -->              
-                     <button type="button" class="btn mx-2" style="border-radius:10px;background-color:#FF9201;"><h style="color:whitesmoke;">Logout</h></button>                 
-                     <button type="button" class="btn mx-2"><h style="color:#FF9201;">@rolemessage</h></button>          
-                     <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                 <div class="d-flex align-items-center">                <!-- Icon -->                <!-- Notifications -->
+                    <a asp-controller="Home" asp-action="logout" >
+                     <button type="button" class="btn mx-2" style="border-radius:10px;background-color:#FF9201;"><h style="color:whitesmoke;">Logout</h></button>
+                    </a>
+                    <button type="button" class="btn mx-2"><h style="color:#FF9201;">@loggedname</h></button>
+                    <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
                          <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="55" alt="Black and White Portrait of a Man" loading="lazy" />             
                      </a>         
                   </div>            <!-- Right elements -->     
             
                   </div>        <!-- Container wrapper -->  
-                  </nav>        <nav style="background-color:#151566;" class="navbar-nav me-auto mb-2 mb-lg-0 ">            <!-- Container wrapper -->            <div class="container-fluid">                <!-- Toggle button -->                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">                    <i class="fas fa-bars"></i>                </button>                <!-- Collapsible wrapper -->                <div class="collapse navbar-collapse" id="navbarSupportedContent">                    <!-- Navbar brand -->                    <!-- Left links -->                    <!-- Left links -->                </div>                <!-- Collapsible wrapper -->                <!-- Right elements -->                <div class="d-flex align-items-center">                    <!-- Icon -->                    <a class="text-reset me-3" href="#">                        <i class="fas fa-shopping-cart"></i>                    </a>                    <!-- Notifications -->                    <div class="dropdown">                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">                            <li class="nav-item ">                                <a class="nav-link text-white" href="#">Leave</a>                            </li>                            <li class="nav-item">                                <a class="nav-link text-white" href="#">Benefits</a>                            </li>                            <li class="nav-item">                                <a class="nav-link text-white" href="#">Payroll</a>                            </li>                             <li class="nav-item">                               <a class="nav-link text-white" href="#">Events</a>                            </li>                            <li class="nav-item">                                <a class="nav-link text-white" href="#">Dashboard</a>                            </li>                        </ul>                    </div>                    <!-- Avatar -->                </div>                <!-- Right elements -->            </div>            <!-- Container wrapper -->        </nav>    <!-- Navbar --></header>
+                  </nav>
+
+
+        <nav style="background-color:#151566;" class="navbar navbar-expand-md navbar-light ">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" color="white" data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon text-white">ICON</span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item ">
+                            <a class="nav-link text-white" href="#">Leave</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#">Benefits</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#">Payroll</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="/home/profiledata?ID=@loggeduserid">Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+
+</header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -41,8 +80,10 @@
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/MDB5/js/mdb.min.js"></script>
+    <script src="~/mdb5-free-standard/js/mdb.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>    @await RenderSectionAsync("Scripts", required: false)
 </body>
-<footer class="bg-light text-center text-lg-start">    <!-- Copyright -->    <div class="text-center p-3" style="background-color: #151566">        <a class="text-white">@@CEI India - All rights reserved</a>    </div>    <!-- Copyright --></footer>
+<footer class="bg-light text-center text-lg-start">  
+    <!-- Copyright -->    <div class="text-center p-3" style="background-color: #151566">      
+        <a class="text-white">@@CEI India - All rights reserved</a>    </div>    <!-- Copyright --></footer>
 </html>

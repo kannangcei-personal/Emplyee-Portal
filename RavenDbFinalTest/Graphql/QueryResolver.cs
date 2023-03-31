@@ -2,6 +2,8 @@
 using RavenDbFinalTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using RavenDbFinalTest.Models;
+using Microsoft.CodeAnalysis.Elfie.Model.Strings;
+using Microsoft.AspNetCore.Http;
 namespace RavenDbFinalTest.Graphql
 {
     public class QueryResolver
@@ -79,6 +81,32 @@ namespace RavenDbFinalTest.Graphql
             
            
         }
+
+        public  async Task<Profile?>  GetProfile(string ID)
+        {
+
+            //string loggedname = _contextAccessor.HttpContext.Session.GetString("Name");
+            //var profile = new Profile();
+            using (var session = _documentStore.OpenSession())
+            {
+                var profile = session.Query<Profile>(collectionName:"Profile").FirstOrDefault(e => e.ExternalId == ID);
+
+                if (profile == null)
+                {
+                   return new Profile { statusmsg = "Profile Not found" };
+
+                    //return "not found";
+                }
+                else
+                {
+                    return profile;
+                  //  return profile.Name;
+                }
+               
+            }
+        }
+
+
 
     }
 

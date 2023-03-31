@@ -4,20 +4,23 @@ using RavenDbFinalTest.Models;
 using System.Diagnostics;
 using Raven.Client.Documents;
 using RavenDbFinalTest.Models;
-
-
+using Microsoft.AspNetCore.Session;
 using GraphQL.Client.Http;
 using GraphQL;
 using GraphQL.Client.Serializer.Newtonsoft;
+using System.Web;
 
 
 namespace RavenDbFinalTest.Controllers
 {
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly HttpClient _httpClient;
         private readonly string _baseURL = "http://localhost:5000";
+
+       
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -33,7 +36,7 @@ namespace RavenDbFinalTest.Controllers
 
         public async Task<IActionResult> Index(String email)
         {
-              var client2 = new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:4000/graphql") }, new NewtonsoftJsonSerializer());
+              var client2 = new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("https://authentication-nodejs-ettd.onrender.com/graphql") }, new NewtonsoftJsonSerializer());
                 var graphqlreq = new GraphQLRequest
                 {
                         Query = @"query($email: String){
@@ -171,7 +174,6 @@ namespace RavenDbFinalTest.Controllers
                 };
                 var res = await client2.SendQueryAsync<dynamic>(graphqlreq);
                 var user = res.Data.getemployee;
-                
 
                 if (user.role == "Admin")
                 {
@@ -203,7 +205,7 @@ namespace RavenDbFinalTest.Controllers
 
             //New code begins
 
-            var client = new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("http://localhost:4000/graphql") }, new NewtonsoftJsonSerializer());
+            var client = new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("https://authentication-nodejs-ettd.onrender.com/graphql") }, new NewtonsoftJsonSerializer());
 
             var Graphlogauth = new GraphQLRequest
             {
@@ -313,7 +315,9 @@ namespace RavenDbFinalTest.Controllers
             }
         }
     */
-        public async Task<IActionResult> LoginAuth(string email2)
+
+        
+        public async Task<IActionResult> LoginAuth(string email2) 
         {   
             try
             {
@@ -329,13 +333,17 @@ namespace RavenDbFinalTest.Controllers
                   emailId
                   role
                   name
+                 externalId
                   }
                 }",
                         Variables = new { email = email2 }
                     };
                     var res = await client2.SendQueryAsync<dynamic>(graphqlreq);
                     var user = res.Data.getemployee;
-                    ViewBag.name = user.name;
+                   string username = user.name;
+                    string id = user.externalId;
+                    HttpContext.Session.SetString("userid", id);
+                    HttpContext.Session.SetString("username", username);
                     return View();
                 }
                 else
@@ -371,11 +379,76 @@ namespace RavenDbFinalTest.Controllers
             }
 
         }
+
+        public  async Task<IActionResult> Profiledata(string ID)
+        {
+
+            try
+            {
+                var userid = HttpContext.Session.GetString("userid");
+                if (userid != ID)
+                {
+
+                    return RedirectToAction("AccessDenied");
+
+                }
+                else
+                {
+                    var client = new GraphQLHttpClient(new GraphQLHttpClientOptions { EndPoint = new Uri("https://localhost:7000/graphql") }, new NewtonsoftJsonSerializer());
+
+                    var graphqlreq = new GraphQLRequest
+                    {
+                        Query = @"query example($extID:String!){
+                    profile(id: $extID){
+                     name
+                     emailId
+                     role
+                     externalId
+                     phone
+                 }
+                }",
+                        Variables = new { extID = ID }
+                    };
+                    var res = await client.SendQueryAsync<dynamic>(graphqlreq);
+                    var user = res.Data.profile;
+                    var userprofile = new Profile
+                    {
+                        Name = user.name,
+                        role = user.role,
+                        EmailId = user.emailId,
+                        ExternalId = user.externalId,
+                        Phone = user.phone,
+
+                    };
+                    return View(userprofile);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return Redirect("Index");
+            }
+
+
+
+        }
+
+
+
+
+
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
     }
     public class MyClass
     {

@@ -1,7 +1,7 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Login Page";
     string Email = ViewBag.Email;
-
+   
     string Error = ViewBag.Error;
     Layout = "~/Views/Shared/Layout1.cshtml";
 }
@@ -9,6 +9,7 @@
 <head>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" asp-append-version="true" media="screen" />
 </head>
 
 
@@ -94,33 +95,31 @@ left:-20px;">
         event.preventDefault();
         var userotp = document.getElementById("userotp");
         var userotpval = userotp.value; var email = document.getElementById("email2");
+        const error = document.getElementById('otp-error');
         var emailval = email.value;
+        var xhr = new XMLHttpRequest();
+      /*  xhr.open("/POST", "/home/LoginAuth");
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = () => { }
+        xhr.send("")
+        */
         $.ajax({
             url: '/home/LoginAuth',
             type: 'post',
             data: {
-             
                 email2: emailval,
                 userotp: userotpval
             },
             success: function (response) {
                 if (response == "Invalid OTP") {
-                    alert(response);
+                    error.innerText="Please Enter Valid OTP"
                 }
                 else {
                     window.location.href = "https://localhost:7000/home/LoginAuth?email2="+emailval;
-                }                 
+                }                 
             }
         });
-    }</script>
-<script>
-    function myFunction() {
-        if (@Error == "Invalid OTP") {
-            const emailError = document.getElementById("email-error");
-            emailError.innerText = "Invalid OTP";
-        }
-    }
-    window.addEventListener("load", myFunction);</script>
+    }</script> 
 <script>
     const loadIndexBtn = document.getElementById('load-index');
     loadIndexBtn.addEventListener('click', function () {
@@ -128,14 +127,11 @@ left:-20px;">
         const divToShow = document.getElementById('my-div');
         const email = document.getElementById('email').value;
         const sendotpbtn = document.getElementById('load-index');
-
         if (email == '') {
             divToShow.classList.add('d-none');
             emailError.innerText = 'Enter Username';
             return;
-        }
-
-        else{
+        } else {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/home/Emailcheck');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -146,9 +142,7 @@ left:-20px;">
                         divToShow.classList.remove('d-none');
                         emailError.innerText = '';
                         let duration = 5;
-                        startTimer(duration);
-
-                        function startTimer(duration) {
+                        startTimer(duration); function startTimer(duration) {
                             let timer = duration;
                             const intervalId = setInterval(function () {
                                 const seconds = parseInt(timer % 60, 10);
@@ -165,24 +159,22 @@ left:-20px;">
                                     sendotpbtn.disabled = false;
                                 }
                             }, 1000);
-                        }
-
-                        const xhr2 = new XMLHttpRequest();
+                        } const xhr2 = new XMLHttpRequest();
                         xhr2.open('POST', '/');
                         xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                         xhr2.onload = function () {
                             if (xhr2.status === 200) {
                                 console.log('Done sending mail');
-                            /*    const resultArray = xhr2.responseText.split(',');
-                                const str1 = resultArray[0];
-                                const str2 = resultArray[1];
-                                    document.getElementById('otp').value = str1;*/
+                                /*    const resultArray = xhr2.responseText.split(',');
+                                    const str1 = resultArray[0];
+                                    const str2 = resultArray[1];
+                                        document.getElementById('otp').value = str1;*/
                                 document.getElementById('email2').value = xhr2.responseText;
                                 setTimeout(function () {
                                     document.getElementById('otp').value = '';
                                 }, 600000);
                             } else {
-                                console.log('Request failed.  Returned status of ' + xhr2.status);
+                                console.log('Request failed.  Returned status of ' + xhr2.status);
                             }
                         };
                         xhr2.send('email=' + encodeURIComponent(email));
@@ -191,16 +183,11 @@ left:-20px;">
                         emailError.innerText = 'Invalid Username';
                     }
                 } else {
-                    console.log('Request failed.  Returned status of ' + xhr.status);
+                    console.log('Request failed.  Returned status of ' + xhr.status);
                 }
             };
             xhr.send('email=' + encodeURIComponent(email));
-
-         }
-       });
-        // kannang
-</script>
-
-
+        }
+    });</script>has context menu
 
                     
